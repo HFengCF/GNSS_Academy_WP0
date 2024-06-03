@@ -45,7 +45,7 @@ def fulfill_dict_fields(dict, path_name):
 
     return dataframe    
  
-def plot_sat_visibility(df):
+def plot_satellite_visibility(df):
     dataframe = df[['SOD', 'PRN', 'ELEV']]
     dataframe['SOD'] = dataframe['SOD']/(3600)
 
@@ -100,6 +100,8 @@ def plot_satellite_longitud_altitude(df):
     dataframe['LON'] = np.degrees(np.arctan2(dataframe['SAT-Y[m]'], dataframe['SAT-X[m]']))
     dataframe['LAT'] = np.degrees(np.arcsin(df['SAT-Z[m]'] / np.sqrt(df['SAT-X[m]']**2 + df['SAT-Y[m]']**2 + df['SAT-Z[m]']**2)))
     
+    fig = plt.figure(figsize=(18, 10))
+    ax = fig.add_subplot()
     # https://naturaldisasters.ai/posts/python-geopandas-world-map-tutorial/
     world = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
 
@@ -111,12 +113,12 @@ def plot_satellite_longitud_altitude(df):
     world = world.drop(world[drop_idxs].index)
     
     world.plot(
+        ax=ax,
         color="lightgray",
         edgecolor="black",
         alpha=0.25,
-        figsize=(15, 10)
+        # figsize=(15, 10)
     )
-
 
     plot = plt.scatter(x = dataframe['LON'].values, y = dataframe['LAT'], c = dataframe['ELEV'].values, cmap='gnuplot', s = 1)
     cbar = plt.colorbar(plot, shrink = 0.5)
@@ -124,12 +126,35 @@ def plot_satellite_longitud_altitude(df):
     plt.title("Satellite Track during visibility periods from TLSA on Year 2015 DoY 006")
     plt.show()
 
+def plot_satellite_speed(df):
+    dataframe = df[['SOD', 'VEL-X[m/s]', 'VEL-Y[m/s]', 'VEL-Z[m/s]', 'ELEV']]
+    dataframe['SOD'] = dataframe['SOD']/(3600)
+    dataframe['ABS_VEL'] = ((dataframe['VEL-X[m/s]']/1000)**2 + (dataframe['VEL-Y[m/s]']/1000)**2 + (dataframe['VEL-Z[m/s]']/1000)**2)**0.5
+
+    plt.figure()
+
+    plt.xlim(left = 0, right =  24)
+    plt.xticks(ticks = range(1, 24))
+
+    plt.title('Satellite Range Velocity from TLSA on Year 2015 and DoY 006')
+    plt.xlabel(xlabel = 'Hour of DoY 006')
+    plt.ylabel(ylabel = 'Absolute Velocity [km/s]')
+
+    plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
+
+    # Markers: https://matplotlib.org/stable/api/markers_api.html
+    plot = plt.scatter(x = dataframe['SOD'].values, y = dataframe['ABS_VEL'].values, c = dataframe['ELEV'].values, cmap='gnuplot', s = 1)
+    cbar = plt.colorbar(plot)
+    cbar.set_label('Elevation [deg]')
+
+    plt.show()
 
 if __name__ == "__main__":
     path_name = f"C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP/OUT/LOS/TLSA00615_LosInfo_5s.dat"
     dict = read_fields_file(path_name)
     dataframe = fulfill_dict_fields(dict, path_name)
 
-    # plot_sat_visibility(dataframe)
+    # plot_satellite_visibility(dataframe)
     # plot_geometrical_range(dataframe)
-    plot_satellite_longitud_altitude(dataframe)
+    # plot_satellite_longitud_altitude(dataframe)
+    plot_satellite_speed(dataframe)
