@@ -6,8 +6,8 @@ import sys, os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-# import cartopy.crs as ccrs
 import geopandas as gpd
+import math
 
 def read_fields_file(path_name):
     fields = {}
@@ -81,10 +81,6 @@ def plot_geometrical_range(df):
     plt.xlim(left = 0, right =  24)
     plt.xticks(ticks = range(1, 24))
 
-    # Lines commented because of high processing
-    # plt.ylim(bottom = (int(min(dataframe['RANGE[m]'].values))-1000) , top = (int(max(dataframe['RANGE[m]'].values))+1000) )
-    # plt.yticks(ticks = sorted(dataframe['RANGE[m]'].unique()))
-
     plt.title('Satellite Visibility from TLSA on Year 2015 and DoY 006')
     plt.xlabel(xlabel = 'Hour of DoY 006')
     plt.ylabel(ylabel = 'Range[km]')
@@ -101,18 +97,33 @@ def plot_geometrical_range(df):
 def plot_satellite_longitud_altitude(df):
     dataframe = df[['SOD', 'SAT-X[m]', 'SAT-Y[m]', 'SAT-Z[m]', 'ELEV']]
 
+    dataframe['LON'] = np.degrees(np.arctan2(dataframe['SAT-Y[m]'], dataframe['SAT-X[m]']))
+    dataframe['LAT'] = np.degrees(np.arcsin(df['SAT-Z[m]'] / np.sqrt(df['SAT-X[m]']**2 + df['SAT-Y[m]']**2 + df['SAT-Z[m]']**2)))
+    
+    # https://naturaldisasters.ai/posts/python-geopandas-world-map-tutorial/
     world = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
+
+    drop_idxs = world["continent"].isin([
+        "Antarctica",
+        "Seven seas (open ocean)"
+    ])
+
+    world = world.drop(world[drop_idxs].index)
+    
     world.plot(
         color="lightgray",
         edgecolor="black",
-        alpha=0.5
+        alpha=0.25,
+        figsize=(15, 10)
     )
-    plt.title("Basic Map of World with GeoPandas")
-    plt.show()
-    # ax = plt.axes(projection=ccrs.PlateCarree())
-    # ax.coastlines()
 
+
+    plot = plt.scatter(x = dataframe['LON'].values, y = dataframe['LAT'], c = dataframe['ELEV'].values, cmap='gnuplot', s = 1)
+    cbar = plt.colorbar(plot, shrink = 0.5)
+    cbar.set_label('Elevation [deg]')
+    plt.title("Satellite Track during visibility periods from TLSA on Year 2015 DoY 006")
     plt.show()
+
 
 if __name__ == "__main__":
     path_name = f"C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP/OUT/LOS/TLSA00615_LosInfo_5s.dat"
