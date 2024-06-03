@@ -6,6 +6,8 @@ import sys, os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+# import cartopy.crs as ccrs
+import geopandas as gpd
 
 def read_fields_file(path_name):
     fields = {}
@@ -96,12 +98,27 @@ def plot_geometrical_range(df):
 
     plt.show()
 
+def plot_satellite_longitud_altitude(df):
+    dataframe = df[['SOD', 'SAT-X[m]', 'SAT-Y[m]', 'SAT-Z[m]', 'ELEV']]
 
+    world = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))
+    world.plot(
+        color="lightgray",
+        edgecolor="black",
+        alpha=0.5
+    )
+    plt.title("Basic Map of World with GeoPandas")
+    plt.show()
+    # ax = plt.axes(projection=ccrs.PlateCarree())
+    # ax.coastlines()
+
+    plt.show()
 
 if __name__ == "__main__":
     path_name = f"C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP/OUT/LOS/TLSA00615_LosInfo_5s.dat"
     dict = read_fields_file(path_name)
     dataframe = fulfill_dict_fields(dict, path_name)
-    print(dataframe)
-    plot_sat_visibility(dataframe)
-    plot_geometrical_range(dataframe)
+
+    # plot_sat_visibility(dataframe)
+    # plot_geometrical_range(dataframe)
+    plot_satellite_longitud_altitude(dataframe)
