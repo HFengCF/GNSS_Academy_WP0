@@ -43,8 +43,8 @@ def fulfill_dict_fields(dict, path_name):
 
     return dataframe    
  
-def plot_sat_visibility(dataframe):
-    # dataframe = dataframe[['SOD', 'PRN', 'ELEV']]
+def plot_sat_visibility(df):
+    dataframe = df[['SOD', 'PRN', 'ELEV']]
     dataframe['SOD'] = dataframe['SOD']/(3600)
 
     plt.figure()
@@ -69,6 +69,33 @@ def plot_sat_visibility(dataframe):
 
     plt.show()
 
+def plot_geometrical_range(df):
+    dataframe = df[['SOD', 'RANGE[m]', 'ELEV']]
+    dataframe['SOD'] = dataframe['SOD']/(3600)
+    dataframe['RANGE[m]'] = dataframe['RANGE[m]']/1000
+
+    plt.figure()
+
+    plt.xlim(left = 0, right =  24)
+    plt.xticks(ticks = range(1, 24))
+
+    # Lines commented because of high processing
+    # plt.ylim(bottom = (int(min(dataframe['RANGE[m]'].values))-1000) , top = (int(max(dataframe['RANGE[m]'].values))+1000) )
+    # plt.yticks(ticks = sorted(dataframe['RANGE[m]'].unique()))
+
+    plt.title('Satellite Visibility from TLSA on Year 2015 and DoY 006')
+    plt.xlabel(xlabel = 'Hour of DoY 006')
+    plt.ylabel(ylabel = 'Range[km]')
+
+    plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
+
+    # Markers: https://matplotlib.org/stable/api/markers_api.html
+    plot = plt.scatter(x = dataframe['SOD'].values, y = dataframe['RANGE[m]'].values, c = dataframe['ELEV'].values, cmap='gnuplot', s = 1)
+    cbar = plt.colorbar(plot)
+    cbar.set_label('Elevation [deg]')
+
+    plt.show()
+
 
 
 if __name__ == "__main__":
@@ -77,3 +104,4 @@ if __name__ == "__main__":
     dataframe = fulfill_dict_fields(dict, path_name)
     print(dataframe)
     plot_sat_visibility(dataframe)
+    plot_geometrical_range(dataframe)
