@@ -43,8 +43,12 @@ def fulfill_dict_fields(dict, path_name):
 
     dataframe[['DOY', 'YEAR', 'PRN']] = dataframe[['DOY', 'YEAR', 'PRN']].astype(int)
 
-    return dataframe    
+    return dataframe
+    
  
+"""
+T2.1. Satellite Visibility Periods
+"""
 def plot_satellite_visibility(df):
     dataframe = df[['SOD', 'PRN', 'ELEV']]
     dataframe['SOD'] = dataframe['SOD']/(3600)
@@ -71,6 +75,10 @@ def plot_satellite_visibility(df):
 
     plt.show()
 
+
+"""
+T2.2. Satellite Geometrical Range
+"""
 def plot_geometrical_range(df):
     dataframe = df[['SOD', 'RANGE[m]', 'ELEV']]
     dataframe['SOD'] = dataframe['SOD']/(3600)
@@ -94,6 +102,10 @@ def plot_geometrical_range(df):
 
     plt.show()
 
+
+"""
+T2.3. Satellite Tracks
+"""
 def plot_satellite_longitud_altitude(df):
     dataframe = df[['SOD', 'SAT-X[m]', 'SAT-Y[m]', 'SAT-Z[m]', 'ELEV']]
 
@@ -126,6 +138,10 @@ def plot_satellite_longitud_altitude(df):
     plt.title("Satellite Track during visibility periods from TLSA on Year 2015 DoY 006")
     plt.show()
 
+
+"""
+T2.4. Satellite Velocity
+"""
 def plot_satellite_speed(df):
     dataframe = df[['SOD', 'VEL-X[m/s]', 'VEL-Y[m/s]', 'VEL-Z[m/s]', 'ELEV']]
     dataframe['SOD'] = dataframe['SOD']/(3600)
@@ -149,6 +165,147 @@ def plot_satellite_speed(df):
 
     plt.show()
 
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------
+"""
+
+T2.5 NAV Satellite Clock
+In process
+
+Each PRN has its own CLK, filter the clock per PRN,
+like PRN19
+
+
+"""
+def plot_satellite_clock(df):
+    dataframe = df[['SOD', 'SV-CLK[m]']]
+    dataframe['SOD'] = dataframe['SOD']/(3600)
+    dataframe['SV-CLK[m]'] = dataframe['SV-CLK[m]']/(1000)
+    plt.figure()
+
+    plt.xlim(left = 0, right =  24)
+    plt.xticks(ticks = range(1, 24))
+
+    plt.title('Satellite Range Velocity from TLSA on Year 2015 and DoY 006')
+    plt.xlabel(xlabel = 'Hour of DoY 006')
+    plt.ylabel(ylabel = 'Absolute Velocity [km/s]')
+
+    plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
+
+    plt.plot(dataframe['SV-CLK[m]'].values)
+
+    plt.show()
+
+
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+"""
+T2.6 Satellite Clock
+"""
+
+
+"""
+T2.7 Satellite TGD
+"""
+def plot_satellite_TGD(df):
+    dataframe = df[['SOD', 'PRN', 'TGD[m]']]
+    dataframe['SOD'] = dataframe['SOD']/(3600)
+
+    plt.figure()
+
+    plt.xlim(left = 0, right =  24)
+    plt.xticks(ticks = range(1, 24))
+
+    plt.title('Satellite Visibility from TLSA on Year 2015 and DoY 006')
+    plt.xlabel(xlabel = 'Hour of DoY 006')
+    plt.ylabel(ylabel = 'TGD[m]')
+
+    plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
+
+    # Markers: https://matplotlib.org/stable/api/markers_api.html
+    plot = plt.scatter(x = dataframe['SOD'].values, y = dataframe['TGD[m]'].values, c = dataframe['PRN'].values, cmap='gnuplot', marker = 's', s = 0.5,
+                )
+    cbar = plt.colorbar(plot)
+    cbar.set_label('GPS-PRN')
+
+    plt.show()
+
+
+
+"""
+T2.8 Satellite DTR
+"""
+def plot_satellite_DTR(df):
+    dataframe = df[['SOD', 'DTR[m]', 'ELEV']]
+    dataframe['SOD'] = dataframe['SOD']/(3600)
+
+    plt.figure()
+
+    plt.xlim(left = 0, right =  24)
+    plt.xticks(ticks = range(1, 24))
+
+    plt.title('Satellite Visibility from TLSA on Year 2015 and DoY 006')
+    plt.xlabel(xlabel = 'Hour of DoY 006')
+    plt.ylabel(ylabel = 'DTR[m]')
+
+    plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
+
+    plot = plt.scatter(x = dataframe['SOD'].values, y = dataframe['DTR[m]'].values, c = dataframe['ELEV'].values, cmap='gnuplot', marker = 's', s = 0.5,
+                )
+    cbar = plt.colorbar(plot)
+    cbar.set_label('Elevation [deg]')
+
+    plt.show()
+
+
+
+
+"""
+T3.1 STEC vs TIME (ELEV)
+"""
+def plot_satellite_STEC(df):
+    dataframe = df[['SOD', 'STEC[m]', 'ELEV']]
+    dataframe['SOD'] = dataframe['SOD']/(3600)
+
+    plt.figure()
+
+    plt.xlim(left = 0, right =  24)
+    plt.xticks(ticks = range(1, 24))
+
+    plt.title('Satellite Visibility from TLSA on Year 2015 and DoY 006')
+    plt.xlabel(xlabel = 'Hour of DoY 006')
+    plt.ylabel(ylabel = 'STEC[m]')
+
+    plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
+
+    plot = plt.scatter(x = dataframe['SOD'].values, y = dataframe['STEC[m]'].values, c = dataframe['ELEV'].values, cmap='gnuplot', marker = 's', s = 0.5,
+                )
+    cbar = plt.colorbar(plot)
+    cbar.set_label('Elevation [deg]')
+
+    plt.show()
+
+
+
+"""
+T3.2 PRN vs TIME (STEC)
+"""
+
+
+"""
+T3.3 VTEC vs. Time
+"""
+
+
+
+"""
+T3.4 PRN vs. TIME
+(VTEC)
+"""
+
+
+
+
+
 if __name__ == "__main__":
     path_name = f"C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP/OUT/LOS/TLSA00615_LosInfo_5s.dat"
     dict = read_fields_file(path_name)
@@ -157,4 +314,9 @@ if __name__ == "__main__":
     # plot_satellite_visibility(dataframe)
     # plot_geometrical_range(dataframe)
     # plot_satellite_longitud_altitude(dataframe)
-    plot_satellite_speed(dataframe)
+    # plot_satellite_speed(dataframe)
+
+    # plot_satellite_clock(dataframe)     # IN PROCESS
+    # plot_satellite_TGD(dataframe)
+    plot_satellite_DTR(dataframe)
+    plot_satellite_STEC(dataframe)
