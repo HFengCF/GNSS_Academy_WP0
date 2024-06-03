@@ -20,7 +20,7 @@ def read_fields_file(path_name):
                 line_splited = line.replace("#", "").split()
                 number_fields = len(line_splited)
                 
-                for i in range(1, number_fields):
+                for i in range(1, number_fields+1):
                     fields[line_splited[i-1]] = []
     return fields
 
@@ -35,7 +35,7 @@ def fulfill_dict_fields(dict, path_name):
             if "#" not in line:
                 line_splited = line.split()
 
-                for i in range(1, len(line_splited)):
+                for i in range(1, len(line_splited)+1):
                     dict[columns[i-1]].append(float(line_splited[i-1]))
 
     # Create dataframe
@@ -75,7 +75,7 @@ def plot_satellite_visibility(df):
     cbar.set_label('Elevation [deg]')
 
     # plt.show()
-    plt.savefig(title+'.png')
+    plt.savefig('SAT_VISIBILITY_TLSA_D006Y15.png')
 
 
 """
@@ -104,7 +104,7 @@ def plot_geometrical_range(df):
     cbar.set_label('Elevation [deg]')
 
     # plt.show()
-    plt.savefig(title+'.png')
+    plt.savefig('SAT_GEOMETRICAL_RANGE_TLSA_D006Y15.png')
 
 
 """
@@ -142,7 +142,7 @@ def plot_satellite_longitud_altitude(df):
     title = 'Satellite Track during visibility periods from TLSA on Year 2015 DoY 006'
     plt.title(title)
     # plt.show()
-    plt.savefig(title+'.png')
+    plt.savefig('SAT_TRACKS_TLSA_D006Y15.png')
 
 
 """
@@ -171,7 +171,7 @@ def plot_satellite_speed(df):
     cbar.set_label('Elevation [deg]')
 
     plt.show()
-    plt.savefig(title+'.png')
+    plt.savefig('SAT_VELOCITY_TLSA_D006Y15.png')
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------
 """
@@ -248,7 +248,7 @@ def plot_satellite_TGD(df):
     cbar.set_label('GPS-PRN')
 
     # plt.show()
-    plt.savefig(title+'.png')
+    plt.savefig('SAT_TGD_TLSA_D006Y15.png')
 
 
 
@@ -277,7 +277,7 @@ def plot_satellite_DTR(df):
     cbar.set_label('Elevation [deg]')
 
     # plt.show()
-    plt.savefig(title+'.png')
+    plt.savefig('SAT_DTR_TLSA_D006Y15.png')
 
 
 
@@ -307,7 +307,7 @@ def plot_satellite_STEC(df):
     cbar.set_label('Elevation [deg]')
 
     plt.show()
-    plt.savefig(title+'.png')
+    plt.savefig('IONO_STEC_vs_TIME_TLSA_D006Y15.png')
 
 
 
@@ -340,20 +340,13 @@ def plot_satellite_visibility_STEC(df):
     cbar.set_label('STEC[m]')
 
     # plt.show()
-    plt.savefig(title+'.png')
+    plt.savefig('IONO_STEC_vs_PRN_TLSA_D006Y15.png')
 
 
 """
 T3.3 VTEC vs. Time
 """
-
-
-
-"""
-T3.4 PRN vs. TIME
-(VTEC)
-"""
-def plot_satellite_visibility_VTEC(df):
+def plot_satellite_VTEC(df):
     dataframe = df[['SOD', 'ELEV', 'VTEC[m]']]
     dataframe['SOD'] = dataframe['SOD']/(3600)
 
@@ -376,13 +369,48 @@ def plot_satellite_visibility_VTEC(df):
     cbar.set_label('ELEV')
 
     plt.show()
-    plt.savefig(title+'.png')
+    plt.savefig('IONO_VTEC_vs_TIME_TLSA_D006Y15.png')
+
+
+
+"""
+T3.4 PRN vs. TIME
+(VTEC)
+"""
+def plot_satellite_visibility_VTEC(df):
+    dataframe = df[['SOD', 'PRN', 'VTEC[m]']]
+    dataframe['SOD'] = dataframe['SOD']/(3600)
+
+    plt.figure()
+
+    plt.xlim(left = 0, right =  24)
+    plt.xticks(ticks = range(1, 24))
+
+    plt.ylim(bottom = 0, top = (int(max(dataframe['PRN'].values))+1) )
+    plt.yticks(ticks = sorted(dataframe['PRN'].unique()))
+
+    title = 'Satellite Visibility vs VTEC from TLSA on Year 2015 and DoY 006'
+    plt.title(title)
+    plt.xlabel(xlabel = 'Hour of DoY 006')
+    plt.ylabel(ylabel = 'GPS-PRN')
+
+    plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
+
+    # Markers: https://matplotlib.org/stable/api/markers_api.html
+    plot = plt.scatter(x = dataframe['SOD'].values, y = dataframe['PRN'].values, c = dataframe['VTEC[m]'].values, cmap='gnuplot', marker = 's', s = 1,
+                )
+    cbar = plt.colorbar(plot)
+    cbar.set_label('VTEC[m]')
+
+    # plt.show()
+    plt.savefig('IONO_VTEC_vs_PRN_TLSA_D006Y15.png')
 
 
 
 
 """
-
+T4.1 STD vs. Time
+(Elevation)
 """
 def plot_satellite_STD(df):
     dataframe = df[['SOD', 'ELEV', 'TROPO[m]']]
@@ -407,12 +435,43 @@ def plot_satellite_STD(df):
     cbar.set_label('ELEV')
     plt.savefig('TROPO_STD_vs_TIME_TLSA_D006Y15.png')
 
+"""
+T4.2 ZTD vs. Time
+(Elevation)
+"""
+def plot_zenith(df):
+    dataframe = df[['SOD', 'ELEV', 'TROPO[m]', 'MPP[elev]']]
+    dataframe['SOD'] = dataframe['SOD']/(3600)
+    dataframe['ZTD'] = dataframe['TROPO[m]']/dataframe['MPP[elev]']
+
+    plt.figure()
+
+    plt.xlim(left = 0, right =  24)
+    plt.xticks(ticks = range(1, 24))
+
+    title = 'Satellite Visibility vs VTEC from TLSA on Year 2015 and DoY 006'
+    plt.title(title)
+    plt.xlabel(xlabel = 'Hour of DoY 006')
+    plt.ylabel(ylabel = 'ZTD')
+
+    plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
+
+    # Markers: https://matplotlib.org/stable/api/markers_api.html
+    plot = plt.scatter(x = dataframe['SOD'].values, y = dataframe['ZTD'].values, c = dataframe['ELEV'].values, cmap='gnuplot', marker = 's', s = 1,
+                )
+    cbar = plt.colorbar(plot)
+    cbar.set_label('ELEV')
+    plt.show()
+    plt.savefig('TROPO_ZTD_vs_TIME_TLSA_D006Y15.png')
+
+
+
 
 if __name__ == "__main__":
     path_name = f"C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP/OUT/LOS/TLSA00615_LosInfo_5s.dat"
     dict = read_fields_file(path_name)
     dataframe = fulfill_dict_fields(dict, path_name)
-
+    print(dataframe)
     ## ------- T2 ----------
     # plot_satellite_visibility(dataframe)
     # plot_geometrical_range(dataframe)
@@ -421,13 +480,16 @@ if __name__ == "__main__":
 
 
     # plot_satellite_clock(dataframe)     # IN PROCESS
+
     # plot_satellite_TGD(dataframe)
     # plot_satellite_DTR(dataframe)
-    # plot_satellite_STEC(dataframe)
 
     ## ------- T3 ----------
+    # plot_satellite_STEC(dataframe)
     # plot_satellite_visibility_STEC(dataframe)
-    plot_satellite_visibility_VTEC(dataframe)           # NOT CORRECT
+    # plot_satellite_STEC(dataframe)
+    # plot_satellite_visibility_VTEC(dataframe)
 
     ## ------- T4 ----------
-    plot_satellite_STD(dataframe)
+    # plot_satellite_STD(dataframe)
+    plot_zenith(dataframe)            # NOT CORRECT
