@@ -5,7 +5,7 @@
 import sys, os
 import numpy as np
 import pandas as pd
-import matplotlib
+import matplotlib.pyplot as plt
 
 def read_fields_file(path_name):
     fields = {}
@@ -44,19 +44,36 @@ def fulfill_dict_fields(dict, path_name):
     return dataframe    
  
 def plot_sat_visibility(dataframe):
-    pass
+    # dataframe = dataframe[['SOD', 'PRN', 'ELEV']]
+    dataframe['SOD'] = dataframe['SOD']/(3600)
 
+    plt.figure()
+
+    plt.xlim(left = 0, right =  24)
+    plt.xticks(ticks = range(1, 24))
+
+    plt.ylim(bottom = 0, top = (int(max(dataframe['PRN'].values))+1) )
+    plt.yticks(ticks = sorted(dataframe['PRN'].unique()))
+
+    plt.title('Satellite Visibility from TLSA on Year 2015 and DoY 006')
+    plt.xlabel(xlabel = 'Hour of DoY 006')
+    plt.ylabel(ylabel = 'GPS-PRN')
+
+    plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
+
+    # Markers: https://matplotlib.org/stable/api/markers_api.html
+    plot = plt.scatter(x = dataframe['SOD'].values, y = dataframe['PRN'].values, c = dataframe['ELEV'].values, cmap='gnuplot', marker = 's', s = 1,
+                )
+    cbar = plt.colorbar(plot)
+    cbar.set_label('Elevation [deg]')
+
+    plt.show()
 
 
 
 if __name__ == "__main__":
-   path_name = f"C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP/OUT/LOS/TLSA00615_LosInfo_5s.dat"
-   dict = read_fields_file(path_name)
-   print(dict)
-   dataframe = fulfill_dict_fields(dict, path_name)
-   print(dataframe)
-
-   dataframe.plot.scatter(x ="SOD", y="PRN", c="ELEV")
-
-   print("Hello world")
-   
+    path_name = f"C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP/OUT/LOS/TLSA00615_LosInfo_5s.dat"
+    dict = read_fields_file(path_name)
+    dataframe = fulfill_dict_fields(dict, path_name)
+    print(dataframe)
+    plot_sat_visibility(dataframe)
