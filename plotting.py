@@ -481,7 +481,7 @@ if __name__ == "__main__":
 
     # plot_satellite_clock(dataframe)     # IN PROCESS
 
-    # plot_satellite_TGD(dataframe)
+    plot_satellite_TGD(dataframe)
     # plot_satellite_DTR(dataframe)
 
     ## ------- T3 ----------
@@ -492,4 +492,4 @@ if __name__ == "__main__":
 
     ## ------- T4 ----------
     # plot_satellite_STD(dataframe)
-    plot_zenith(dataframe)            # NOT CORRECT
+    # plot_zenith(dataframe)            # NOT CORRECT
