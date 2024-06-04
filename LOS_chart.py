@@ -9,7 +9,7 @@ import cartopy.crs as ccrs
 import math
 from search_file import read_fields_file, fill_data_fields
 
-class Charts:
+class LOS_Charts:
     def __init__(self, df) -> None:
         self.dataframe = df
         self.dataframe['Hour'] = self.dataframe['SOD']/(3600)
@@ -106,11 +106,7 @@ class Charts:
 if __name__ == "__main__":
     path_name = f"C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP/OUT/LOS/TLSA00615_LosInfo_5s.dat"
     dict = read_fields_file(path_name)
-    LOS_graph = Charts(fill_data_fields(dict, path_name))
-
-    path_name = f"C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP/OUT/POS/TLSA00615_PosInfo_5s.dat"
-    dict = read_fields_file(path_name)
-    POS_graph = Charts(fill_data_fields(dict, path_name))
+    LOS_graph = LOS_Charts(fill_data_fields(dict, path_name))
 
     # Filling data
     dataframe = LOS_graph.get_dataframe()
@@ -196,14 +192,3 @@ if __name__ == "__main__":
     #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Time of Flight (ToF)", \
     #                        x_label_name = 'Hour of DoY', y_label_name = 'TOF[ms]', color_bar_label_name = 'Elevation [deg]'
     #                        )
-    
-
-
-
-
-
-    # T6.6 EPE vs. NPE plot
-    POS_graph.plot_scatterplot_POS(x_column_name = 'EPE[m]', y_column_name = 'NPE[m]', color_bar_column_name = 'HDOP', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "EPE vs NPE", \
-                           x_label_name = 'EPE[m]', y_label_name = 'NPE[m]', color_bar_label_name = 'HDOP'
-                           )
