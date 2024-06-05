@@ -111,7 +111,8 @@ if __name__ == "__main__":
     # Filling data
     dataframe = LOS_graph.get_dataframe()
     dataframe['ABS_VEL'] = ((dataframe['VEL-X[m/s]']/1000)**2 + (dataframe['VEL-Y[m/s]']/1000)**2 + (dataframe['VEL-Z[m/s]']/1000)**2)**0.5
-    dataframe['ZTD'] = dataframe['TROPO[m]'] / dataframe['MPP[elev]']
+    dataframe['ELEV_radians'] = dataframe['ELEV']*(math.pi/180)
+    dataframe['ZTD'] = dataframe['TROPO[m]'] / (1.001 / (0.002001 + np.sin(dataframe['ELEV_radians'])**2 )**0.5 )
     LOS_graph.set_dataframe(df = dataframe)
 
     # ------------------------------------------------- T2 ----------------------------------------------------------------------------
@@ -175,10 +176,10 @@ if __name__ == "__main__":
     #                        )
     
     # Zenith NOT GOOD
-    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'ZTD', color_bar_column_name = 'ELEV', y_div = 1, \
-    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Zenith Tropospheric Delays (ZTD)", \
-    #                        x_label_name = 'Hour of DoY', y_label_name = 'ZTD', color_bar_label_name = 'Elevation [deg]'
-    #                        )
+    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'ZTD', color_bar_column_name = 'ELEV', y_div = 1, \
+                           default_x_ticks = False, default_y_ticks = True, title_plot = "Zenith Tropospheric Delays (ZTD)", \
+                           x_label_name = 'Hour of DoY', y_label_name = 'ZTD', color_bar_label_name = 'Elevation [deg]'
+                           )
     
     # T5.1 Pseudo Ranges
 
