@@ -23,7 +23,7 @@ class POS_Charts:
     def set_dataframe(self, df):
         self.dataframe = df
 
-    def plot_linearplot(self, x_column_name, x_column_label, y_column_label, title_plot = "Default_Title", **kwargs):
+    def plot_linearplot(self, x_column_name, x_column_label, y_column_label, title_plot = "Default_Title", output_file_name = 'Output' , **kwargs):
         plt.rcParams["image.cmap"] = "gnuplot"
         # Change color set used: https://matplotlib.org/stable/gallery/color/colormap_reference.html
         plt.rcParams['axes.prop_cycle'] = plt.cycler(color=plt.cm.Paired.colors)
@@ -42,12 +42,13 @@ class POS_Charts:
         
         plt.legend()
 
-        plt.show()
+        # plt.show()
+        plt.savefig(output_file_name+'.png')
         
 
 
 
-    def plot_scatterplot_POS(self, x_column_name, y_column_name, color_bar_column_name, y_div = 1,default_x_ticks =  False, default_y_ticks = False, title_plot = "Default_Title", x_label_name = None, y_label_name = None, color_bar_label_name = None):
+    def plot_scatterplot_POS(self, x_column_name, y_column_name, color_bar_column_name, y_div = 1,default_x_ticks =  False, default_y_ticks = False, title_plot = "Default_Title", x_label_name = None, y_label_name = None, color_bar_label_name = None,  output_file_name = 'Output'):
         dataframe = self.dataframe[[x_column_name, y_column_name, color_bar_column_name, 'DOY', 'YEAR']]
         dataframe[y_column_name] = dataframe[y_column_name]/y_div
 
@@ -74,7 +75,8 @@ class POS_Charts:
         cbar = plt.colorbar(plot)
         cbar.set_label(color_bar_label_name)
 
-        plt.show()
+        # plt.show()
+        plt.savefig(output_file_name+'.png')
 
 if __name__ == "__main__":
     path_name = f"C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP/OUT/POS/TLSA00615_PosInfo_5s.dat"
@@ -88,18 +90,19 @@ if __name__ == "__main__":
     dataframe['VPE'] = abs(dataframe['UPE[m]'])
     POS_graph.set_dataframe(df = dataframe)
 
-    POS_graph.plot_linearplot(x_column_name = 'Hour', x_column_label = 'Hour of DoY', y_column_label = 'Number of Satellites', title_plot = "Number of Satellites in PVT vs Time", y_column_name = 'NSATS')
+    POS_graph.plot_linearplot(x_column_name = 'Hour', x_column_label = 'Hour of DoY', y_column_label = 'Number of Satellites', title_plot = "Number of Satellites in PVT vs Time", output_file_name = 'POS_SATS_vs_TIME_TLSA_D006Y15', y_column_name = 'NSATS')
 
-    POS_graph.plot_linearplot(x_column_name = 'Hour', x_column_label = 'Hour of DoY', y_column_label = 'DOP', title_plot = "Dilution of Precision (DOP)", y_column_1 = 'GDOP', y_column_2 = 'PDOP', y_column_3 = 'TDOP')
+    POS_graph.plot_linearplot(x_column_name = 'Hour', x_column_label = 'Hour of DoY', y_column_label = 'DOP', title_plot = "Dilution of Precision (DOP)", output_file_name = 'POS_DOP_vs_TIME_TLSA_D006Y15', y_column_1 = 'GDOP', y_column_2 = 'PDOP', y_column_3 = 'TDOP')
 
-    POS_graph.plot_linearplot(x_column_name = 'Hour', x_column_label = 'Hour of DoY', y_column_label = 'DOP', title_plot = "Dilution of Precision (DOP)", y_column_1 = 'HDOP', y_column_2 = 'VDOP', y_column_3 = 'NSATS')
+    POS_graph.plot_linearplot(x_column_name = 'Hour', x_column_label = 'Hour of DoY', y_column_label = 'DOP', title_plot = "Dilution of Precision (DOP)", output_file_name = 'POS_HVDOP_vs_TIME_TLSA_D006Y15', y_column_1 = 'HDOP', y_column_2 = 'VDOP', y_column_3 = 'NSATS')
 
-    POS_graph.plot_linearplot(x_column_name = 'Hour', x_column_label = 'Hour of DoY', y_column_label = 'ENU_PM[m]', title_plot = "ENU Position Error", y_column_1 = 'UPE[m]', y_column_2 = 'EPE[m]', y_column_3 = 'NPE[m]')
+    POS_graph.plot_linearplot(x_column_name = 'Hour', x_column_label = 'Hour of DoY', y_column_label = 'ENU_PM[m]', title_plot = "ENU Position Error", output_file_name = 'POS_ENU_PE_vs_TIME_TLSA_D006Y15', y_column_1 = 'UPE[m]', y_column_2 = 'EPE[m]', y_column_3 = 'NPE[m]')
     
-    POS_graph.plot_linearplot(x_column_name = 'Hour', x_column_label = 'Hour of DoY', y_column_label = 'H/VPE[m]', title_plot = "HPE-VPE Position Error", y_column_1 = 'VPE', y_column_2 = 'HPE')
+    POS_graph.plot_linearplot(x_column_name = 'Hour', x_column_label = 'Hour of DoY', y_column_label = 'H/VPE[m]', title_plot = "HPE-VPE Position Error", output_file_name = 'POS_HVPE_vs_TIME_TLSA_D006Y15', y_column_1 = 'VPE', y_column_2 = 'HPE')
    
     # T6.6 EPE vs. NPE plot
     POS_graph.plot_scatterplot_POS(x_column_name = 'EPE[m]', y_column_name = 'NPE[m]', color_bar_column_name = 'HDOP', y_div = 1, \
                            default_x_ticks = False, default_y_ticks = True, title_plot = "EPE vs NPE", \
-                           x_label_name = 'EPE[m]', y_label_name = 'NPE[m]', color_bar_label_name = 'HDOP'
+                           x_label_name = 'EPE[m]', y_label_name = 'NPE[m]', color_bar_label_name = 'HDOP', \
+                           output_file_name = 'POS_NPE_vs_EPE_TLSA_D006Y15'
                            )
