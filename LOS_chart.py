@@ -151,7 +151,8 @@ if __name__ == "__main__":
     """ ----------------------------------------- Filling data ----------------------------------------- """
     dataframe = LOS_graph.get_dataframe()
     # T2.4
-    dataframe['ABS_VEL'] = ((dataframe['VEL-X[m/s]']/1000)**2 + (dataframe['VEL-Y[m/s]']/1000)**2 + (dataframe['VEL-Z[m/s]']/1000)**2)**0.5
+    dataframe['ABS_VEL[m]'] = ((dataframe['VEL-X[m/s]'])**2 + (dataframe['VEL-Y[m/s]'])**2 + (dataframe['VEL-Z[m/s]'])**2)**0.5
+    dataframe['ABS_VEL[km]'] = dataframe['ABS_VEL[m]']/1000
 
     # T2.6
     dataframe['CLK_P1[km]'] = dataframe['SV-CLK[m]']/1000 - dataframe['TGD[m]']/1000 + dataframe['DTR[m]']/1000
@@ -164,10 +165,9 @@ if __name__ == "__main__":
     dataframe['Tau[ms]'] = dataframe['TROPO[m]']/light_speed
 
     # T5.4
-    dataframe['R_LOS'] = (dataframe['SAT-X[m]']**2 + dataframe['SAT-Y[m]']**2 + dataframe['SAT-Z[m]']**2)**0.5 - (x_pos_receiver**2 + y_pos_receiver**2 + z_pos_receiver**2)**0.5
-    dataframe['U_LOS'] = dataframe['R_LOS'] / abs(dataframe['R_LOS'])
-    dataframe['V_LOS'] = dataframe['U_LOS'] * dataframe['ABS_VEL']
-    dataframe['F_Doppler'] = - (dataframe['V_LOS']/ light_speed) * frecuency_L1
+    dataframe['R_LOS[m]'] = (dataframe['SAT-X[m]']**2 + dataframe['SAT-Y[m]']**2 + dataframe['SAT-Z[m]']**2)**0.5 - (x_pos_receiver**2 + y_pos_receiver**2 + z_pos_receiver**2)**0.5
+    dataframe['V_LOS[m]'] = dataframe['ABS_VEL[m]'] * ( dataframe['R_LOS[m]'] / abs(dataframe['R_LOS[m]']) )
+    dataframe['F_Doppler'] = - ( dataframe['V_LOS[m]']/light_speed ) * frecuency_L1
 
     # T5.5
     dataframe['RES[km]'] = dataframe['MEAS[m]']/1000 - (dataframe['RANGE[m]']/1000 - dataframe['CLK_P1[km]'] + dataframe['STEC[m]']/1000 + dataframe['TROPO[m]']/1000)
@@ -200,7 +200,7 @@ if __name__ == "__main__":
     """
     T2.4. Satellite Velocity
     """ 
-    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'ABS_VEL', color_bar_column_name = 'ELEV', y_div = 1, \
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'ABS_VEL[m]', color_bar_column_name = 'ELEV', y_div = 1000, \
     #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite Range Velocity", \
     #                        x_label_name = 'Hour of DoY', y_label_name = 'Absolute Velocity [km/s]', color_bar_label_name = 'Elevation [deg]'
     #                        )
@@ -309,18 +309,18 @@ if __name__ == "__main__":
     T5.4 Doppler
     Frequency
     """
-    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'F_Doppler', color_bar_column_name = 'ELEV', y_div = 1, \
-    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Doppler Frequency", \
-    #                        x_label_name = 'Hour of DoY', y_label_name = 'Doppler Frequency [kHz]', color_bar_label_name = 'Elevation [deg]'
-    #                        )
+    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'F_Doppler', color_bar_column_name = 'ELEV', y_div = 1, \
+                           default_x_ticks = False, default_y_ticks = True, title_plot = "Doppler Frequency", \
+                           x_label_name = 'Hour of DoY', y_label_name = 'Doppler Frequency [kHz]', color_bar_label_name = 'Elevation [deg]'
+                           )
 
 
     """
     T5.5 Residuals C1
     """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'RES[km]', color_bar_column_name = 'PRN', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Doppler Frequency", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'Residuals [km]', color_bar_label_name = 'GPS-PRN'
-                           )
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'RES[km]', color_bar_column_name = 'PRN', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Doppler Frequency", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'Residuals [km]', color_bar_label_name = 'GPS-PRN'
+    #                        )
 
 
