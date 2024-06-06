@@ -141,12 +141,37 @@ if __name__ == "__main__":
     dict = read_fields_file(path_name)
     LOS_graph = LOS_Charts(fill_data_fields(dict, path_name))
 
-    # Filling data
+    light_speed = 299792458
+    frecuency_L1 = 1575.42
+    
+    x_pos_receiver = 4637952.29175333
+    y_pos_receiver = 121207.93198126
+    z_pos_receiver = 4362375.76379941
+
+    """ ----------------------------------------- Filling data ----------------------------------------- """
     dataframe = LOS_graph.get_dataframe()
+    # T2.4
     dataframe['ABS_VEL'] = ((dataframe['VEL-X[m/s]']/1000)**2 + (dataframe['VEL-Y[m/s]']/1000)**2 + (dataframe['VEL-Z[m/s]']/1000)**2)**0.5
-    dataframe['CLK_P1[km]'] = dataframe['SV-CLK[m]']/1000 - dataframe['TGD[m]'] + dataframe['DTR[m]']
+
+    # T2.6
+    dataframe['CLK_P1[km]'] = dataframe['SV-CLK[m]']/1000 - dataframe['TGD[m]']/1000 + dataframe['DTR[m]']/1000
+
+    # T4.2
     dataframe['ELEV_radians'] = dataframe['ELEV']*(math.pi/180)
     dataframe['ZTD'] = dataframe['TROPO[m]'] / (1.001 / (0.002001 + np.sin(dataframe['ELEV_radians'])**2 )**0.5 )
+
+    # T5.2 
+    dataframe['Tau[ms]'] = dataframe['TROPO[m]']/light_speed
+
+    # T5.4
+    dataframe['R_LOS'] = (dataframe['SAT-X[m]']**2 + dataframe['SAT-Y[m]']**2 + dataframe['SAT-Z[m]']**2)**0.5 - (x_pos_receiver**2 + y_pos_receiver**2 + z_pos_receiver**2)**0.5
+    dataframe['U_LOS'] = dataframe['R_LOS'] / abs(dataframe['R_LOS'])
+    dataframe['V_LOS'] = dataframe['U_LOS'] * dataframe['ABS_VEL']
+    dataframe['F_Doppler'] = - (dataframe['V_LOS']/ light_speed) * frecuency_L1
+
+    # T5.5
+    dataframe['RES[km]'] = dataframe['MEAS[m]']/1000 - (dataframe['RANGE[m]']/1000 - dataframe['CLK_P1[km]'] + dataframe['STEC[m]']/1000 + dataframe['TROPO[m]']/1000)
+
     LOS_graph.set_dataframe(df = dataframe)
 
     # ------------------------------------------------- T2 ----------------------------------------------------------------------------
@@ -255,15 +280,47 @@ if __name__ == "__main__":
     #                        x_label_name = 'Hour of DoY', y_label_name = 'ZTD', color_bar_label_name = 'Elevation [deg]'
     #                        )
     
-    # T5.1 Pseudo Ranges
+    """
+    T5.1 PSR vs Time
+    """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'MEAS[m]', color_bar_column_name = 'ELEV', y_div = 1000, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Time of Flight (ToF)", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'MEAS[Km]', color_bar_label_name = 'Elevation [deg]'
+    #                        )
+
+    """
+    T5.2 TAU vs Time
+    """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'MEAS[m]', color_bar_column_name = 'ELEV', y_div = 1000, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Time of Flight (ToF)", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'MEAS[Km]', color_bar_label_name = 'Elevation [deg]'
+    #                        )
 
 
+    """
+    T5.3 ToF vs Time
+    """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'TOF[ms]', color_bar_column_name = 'ELEV', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Time of Flight (ToF)", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'TOF[ms]', color_bar_label_name = 'Elevation [deg]'
+    #                        )
+    
+    """
+    T5.4 Doppler
+    Frequency
+    """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'F_Doppler', color_bar_column_name = 'ELEV', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Doppler Frequency", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'Doppler Frequency [kHz]', color_bar_label_name = 'Elevation [deg]'
+    #                        )
 
 
-
-
-    # T5.3
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'TOF[ms]', color_bar_column_name = 'ELEV', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Time of Flight (ToF)", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'TOF[ms]', color_bar_label_name = 'Elevation [deg]'
+    """
+    T5.5 Residuals C1
+    """
+    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'RES[km]', color_bar_column_name = 'PRN', y_div = 1, \
+                           default_x_ticks = False, default_y_ticks = True, title_plot = "Doppler Frequency", \
+                           x_label_name = 'Hour of DoY', y_label_name = 'Residuals [km]', color_bar_label_name = 'GPS-PRN'
                            )
+
+
