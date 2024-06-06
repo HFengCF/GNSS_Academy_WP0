@@ -20,9 +20,10 @@ class LOS_Charts:
     def set_dataframe(self, df):
         self.dataframe = df
 
-    def plot_scatterplot(self, x_column_name, y_column_name, color_bar_column_name, y_div = 1,default_x_ticks =  False, default_y_ticks = False, title_plot = "Default_Title", x_label_name = None, y_label_name = None, color_bar_label_name = None):
+    def plot_scatterplot(self, x_column_name, y_column_name, color_bar_column_name, y_div = 1, default_x_ticks =  False, default_y_ticks = False, title_plot = "Default_Title", x_label_name = None, y_label_name = None, color_bar_label_name = None):
         dataframe = self.dataframe[[x_column_name, y_column_name, color_bar_column_name, 'DOY', 'YEAR']]
-        dataframe[y_column_name] = dataframe[y_column_name]/y_div
+        if y_div != 1:
+            dataframe[y_column_name] = dataframe[y_column_name]/y_div
 
         plt.figure(figsize=(18,12))
 
@@ -74,34 +75,74 @@ class LOS_Charts:
 
         plt.show()
 
-    def plot_scatterplot_POS(self, x_column_name, y_column_name, color_bar_column_name, y_div = 1,default_x_ticks =  False, default_y_ticks = False, title_plot = "Default_Title", x_label_name = None, y_label_name = None, color_bar_label_name = None):
-        dataframe = self.dataframe[[x_column_name, y_column_name, color_bar_column_name, 'DOY', 'YEAR']]
-        dataframe[y_column_name] = dataframe[y_column_name]/y_div
+    def plot_multiple_scatterplot(self, x_column_name, y_column_name, filter_by, y_div = 1, default_x_ticks =  False, default_y_ticks = False, title_plot = "Default_Title", x_label_name = None, y_label_name = None):
+        dataframe = self.dataframe[[x_column_name, y_column_name, filter_by, 'DOY', 'YEAR']]
+        if y_div != 1:
+            dataframe[y_column_name] = dataframe[y_column_name]/y_div
 
-        plt.figure(figsize=(10,6))
+        dataframe[[filter_by]] = dataframe[[filter_by]].astype(str)
 
-        if default_x_ticks == False:
-            x_max_value = math.ceil(max(dataframe[x_column_name].values))
-            plt.xlim(left = -2.5, right = 3)
-            plt.xticks(ticks = range(-3, 3))
+        list_unique_values = sorted(list(dataframe[filter_by].unique()))
 
-        if default_y_ticks == False:
-            plt.ylim(bottom = -3, top = 5)
-            plt.yticks(ticks = range(-3, 5))
+        for i in list_unique_values:
+            plt.figure(figsize=(18,12))
+            df_aux = dataframe[dataframe[filter_by].str.contains(i)]
 
-        # Formats: https://www.w3schools.com/python/ref_string_format.asp
-        title = title_plot + " from TLSA on Year {:n} DoY {:3n}".format(dataframe['YEAR'].iloc[0], dataframe['DOY'].iloc[0])
+            df_aux[[filter_by]] = df_aux[[filter_by]].astype(float)
 
-        plt.title(title)
-        plt.xlabel(xlabel = x_label_name)
-        plt.ylabel(ylabel = y_label_name)
+            if default_x_ticks == False:
+                x_max_value = math.ceil(max(dataframe[x_column_name].values))
+                plt.xlim(left = 0, right =  x_max_value)
+                plt.xticks(ticks = range(1, x_max_value))
 
-        plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
-        plot = plt.scatter(x = dataframe[x_column_name].values, y = dataframe[y_column_name].values, c = dataframe[color_bar_column_name].values, cmap='gnuplot', marker = 's', s = 1)
-        cbar = plt.colorbar(plot)
-        cbar.set_label(color_bar_label_name)
+            if default_y_ticks == False:
+                plt.ylim(bottom = 0, top = (int(max(dataframe[y_column_name].values))+1) )
+                plt.yticks(ticks = sorted(dataframe[y_column_name].unique()))
 
-        plt.show()
+            # Formats: https://www.w3schools.com/python/ref_string_format.asp
+            title = title_plot + " PRN {} from TLSA on Year {:n} DoY {:3n}".format(i, dataframe['YEAR'].iloc[0], dataframe['DOY'].iloc[0])
+            plt.title(title)
+            plt.xlabel(xlabel = x_label_name)
+            plt.ylabel(ylabel = y_label_name)
+
+            plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
+            plot = plt.scatter(x = dataframe[x_column_name].values, y = dataframe[y_column_name].values, marker = 's', s = 1)
+            plt.show()
+
+    def plot_multiple_plot(self, x_column_name, y_column_name, filter_by, y_div = 1, default_x_ticks =  False, default_y_ticks = False, title_plot = "Default_Title", x_label_name = None, y_label_name = None):
+        dataframe = self.dataframe[[x_column_name, y_column_name, filter_by, 'DOY', 'YEAR']]
+        if y_div != 1:
+            dataframe[y_column_name] = dataframe[y_column_name]/y_div
+
+        dataframe[[filter_by]] = dataframe[[filter_by]].astype(str)
+
+        list_unique_values = sorted(list(dataframe[filter_by].unique()))
+
+        for i in list_unique_values:
+            plt.figure(figsize=(18,12))
+            df_aux = dataframe[dataframe[filter_by].str.contains(i), x_column_name]
+
+            df_aux[[filter_by]] = df_aux[[filter_by]].astype(float)
+
+            if default_x_ticks == False:
+                x_max_value = math.ceil(max(dataframe[x_column_name].values))
+                plt.xlim(left = 0, right =  x_max_value)
+                plt.xticks(ticks = range(1, x_max_value))
+
+            if default_y_ticks == False:
+                plt.ylim(bottom = 0, top = (int(max(dataframe[y_column_name].values))+1) )
+                plt.yticks(ticks = sorted(dataframe[y_column_name].unique()))
+
+            # Formats: https://www.w3schools.com/python/ref_string_format.asp
+            title = title_plot + " PRN {} from TLSA on Year {:n} DoY {:3n}".format(i, dataframe['YEAR'].iloc[0], dataframe['DOY'].iloc[0])
+            plt.title(title)
+            plt.xlabel(xlabel = x_label_name)
+            plt.ylabel(ylabel = y_label_name)
+
+            plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
+            plot = plt.scatter(x = df_aux[x_column_name].values, y = df_aux[y_column_name].values, marker = 's', s = 1)
+            plt.show()
+
 
 if __name__ == "__main__":
     path_name = f"C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP/OUT/LOS/TLSA00615_LosInfo_5s.dat"
@@ -111,6 +152,7 @@ if __name__ == "__main__":
     # Filling data
     dataframe = LOS_graph.get_dataframe()
     dataframe['ABS_VEL'] = ((dataframe['VEL-X[m/s]']/1000)**2 + (dataframe['VEL-Y[m/s]']/1000)**2 + (dataframe['VEL-Z[m/s]']/1000)**2)**0.5
+    dataframe['CLK_P1[km]'] = dataframe['SV-CLK[m]']/1000 - dataframe['TGD[m]'] + dataframe['DTR[m]']
     dataframe['ELEV_radians'] = dataframe['ELEV']*(math.pi/180)
     dataframe['ZTD'] = dataframe['TROPO[m]'] / (1.001 / (0.002001 + np.sin(dataframe['ELEV_radians'])**2 )**0.5 )
     LOS_graph.set_dataframe(df = dataframe)
@@ -140,9 +182,17 @@ if __name__ == "__main__":
     #                        x_label_name = 'Hour of DoY', y_label_name = 'Absolute Velocity [km/s]', color_bar_label_name = 'Elevation [deg]'
     #                        )
     
-    # T2.5 NAV Satellite Clock and T2.6 Satellite Clock still in process
+    # T2.5 NAV Satellite Clock in process
+    # LOS_graph.plot_multiple_scatterplot(x_column_name = 'Hour', y_column_name = 'SV-CLK[m]', filter_by = 'PRN', default_x_ticks = False, default_y_ticks = False, title_plot = "NAV CLK", x_label_name = None, y_label_name = None)
 
 
+    # T2.6 Satellite Clock still in process
+    LOS_graph.plot_multiple_scatterplot(x_column_name = 'Hour', y_column_name = 'SV-CLK[m]', filter_by = 'PRN', default_x_ticks = False, default_y_ticks = True, title_plot = "NAV CLK", x_label_name = None, y_label_name = None)
+
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'CLK_P1[km]', color_bar_column_name = 'PRN', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite CLK + DTR - TGD", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'CLK[km]', color_bar_label_name = 'GPS-PRN'
+    #                        )
 
 
     # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'TGD[m]', color_bar_column_name = 'PRN', y_div = 1, \
@@ -175,11 +225,11 @@ if __name__ == "__main__":
     #                        x_label_name = 'Hour of DoY', y_label_name = 'GPS-PRN', color_bar_label_name = 'VTEC[m]'
     #                        )
     
-    # Zenith NOT GOOD
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'ZTD', color_bar_column_name = 'ELEV', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Zenith Tropospheric Delays (ZTD)", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'ZTD', color_bar_label_name = 'Elevation [deg]'
-                           )
+    # Zenith GOOD
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'ZTD', color_bar_column_name = 'ELEV', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Zenith Tropospheric Delays (ZTD)", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'ZTD', color_bar_label_name = 'Elevation [deg]'
+    #                        )
     
     # T5.1 Pseudo Ranges
 
