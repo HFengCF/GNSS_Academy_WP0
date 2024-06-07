@@ -40,6 +40,7 @@ class POS_Charts:
 
         plt.xlim(left = self.min_hour, right = self.max_hour)
         
+        plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
         plt.legend()
 
         # plt.show()

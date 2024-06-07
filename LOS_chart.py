@@ -10,10 +10,14 @@ import math
 from search_file import read_fields_file, fill_data_fields
 
 class LOS_Charts:
-    def __init__(self, df) -> None:
+    def __init__(self, df, output_path = None) -> None:
         self.dataframe = df
         self.dataframe['Hour'] = self.dataframe['SOD']/(3600)
         self.dataframe[['DOY', 'YEAR']] = self.dataframe[['DOY', 'YEAR']].astype(int)
+        if output_path is not None:
+            self.output_path = output_path
+        else:
+            self.output_path = ""  
 
     def get_dataframe(self):
         return self.dataframe
@@ -23,6 +27,9 @@ class LOS_Charts:
 
     def plot_scatterplot(self, x_column_name, y_column_name, color_bar_column_name, y_div = 1, default_x_ticks =  False, default_y_ticks = False, title_plot = "Default_Title", x_label_name = None, y_label_name = None, color_bar_label_name = None, output_file_name = "Output"):
         dataframe = self.dataframe[[x_column_name, y_column_name, color_bar_column_name, 'DOY', 'YEAR']]
+
+        print(title_plot+'...')
+
         if y_div != 1:
             dataframe[y_column_name] = dataframe[y_column_name]/y_div
 
@@ -50,10 +57,12 @@ class LOS_Charts:
         cbar.set_label(color_bar_label_name)
 
         # plt.show()
-        plt.savefig(output_file_name+'.png')
+        plt.savefig(self.output_path+output_file_name+'.png')
 
     def plot_scatterplot_in_map(self, x_pos_column, y_pos_column, z_pos_column, color_bar_column_name, title_plot = "Default title", color_bar_label_name = None, output_file_name = "Output"):
         dataframe = self.dataframe[['DOY', 'YEAR', x_pos_column, y_pos_column, z_pos_column, color_bar_column_name]]
+
+        print(title_plot+'...')
 
         dataframe['LON'] = np.degrees(np.arctan2(dataframe['SAT-Y[m]'], dataframe['SAT-X[m]']))
         dataframe['LAT'] = np.degrees(np.arcsin(dataframe['SAT-Z[m]'] / np.sqrt(dataframe['SAT-X[m]']**2 + dataframe['SAT-Y[m]']**2 + dataframe['SAT-Z[m]']**2)))
@@ -76,10 +85,13 @@ class LOS_Charts:
         cbar.set_label(color_bar_label_name)
 
         # plt.show()
-        plt.savefig(output_file_name+'.png')
+        plt.savefig(self.output_path+output_file_name+'.png')
 
-    def plot_multiple_scatterplot(self, x_column_name, y_column_name, filter_by, y_div = 1, default_x_ticks =  False, default_y_ticks = False, title_plot = "Default_Title", x_label_name = None, y_label_name = None, output_file_name = "Output"):
+    def plot_multiple_sub_scatterplot(self, x_column_name, y_column_name, filter_by, y_div = 1, default_x_ticks =  False, default_y_ticks = False, title_plot = "Default_Title", x_label_name = None, y_label_name = None, output_file_name = "Output"):
         dataframe = self.dataframe[[x_column_name, y_column_name, filter_by, 'DOY', 'YEAR']]
+
+        print(title_plot+'...')
+
         if y_div != 1:
             dataframe[y_column_name] = dataframe[y_column_name]/y_div
 
@@ -111,33 +123,7 @@ class LOS_Charts:
             plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
             plot = plt.scatter(x = df_aux[x_column_name].values, y = df_aux[y_column_name].values, marker = 's', s = 1)
             # plt.show()
-            plt.savefig(output_file_name+filter_by+str(i)+'.png')
-
-    def plot_multiple_scatterplot_B(self, x_column_name, y_column_name, color_bar_column_name, y_div = 1, default_x_ticks =  False, default_y_ticks = False, title_plot = "Default_Title", x_label_name = None, y_label_name = None):
-        dataframe = self.dataframe[[x_column_name, y_column_name, color_bar_column_name, 'DOY', 'YEAR']]
-        if y_div != 1:
-            dataframe[y_column_name] = dataframe[y_column_name]/y_div
-
-        plt.figure(figsize=(18,12))
-
-        if default_x_ticks == False:
-            x_max_value = math.ceil(max(dataframe[x_column_name].values))
-            plt.xlim(left = 0, right =  x_max_value)
-            plt.xticks(ticks = range(1, x_max_value))
-
-        if default_y_ticks == False:
-            plt.ylim(bottom = 0, top = (int(max(dataframe[y_column_name].values))+1) )
-            plt.yticks(ticks = sorted(dataframe[y_column_name].unique()))
-
-        # Formats: https://www.w3schools.com/python/ref_string_format.asp
-        title = title_plot + " from TLSA on Year {:n} DoY {:3n}".format(dataframe['YEAR'].iloc[0], dataframe['DOY'].iloc[0])
-        plt.title(title)
-        plt.xlabel(xlabel = x_label_name)
-        plt.ylabel(ylabel = y_label_name)
-
-        plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
-        plot = plt.scatter(x = dataframe[x_column_name].values, y = dataframe[y_column_name].values, marker = 's', s = 1)
-        plt.show()
+            plt.savefig(self.output_path+'/SubPlots/'+output_file_name+filter_by+str(i)+'.png')
 
 
 if __name__ == "__main__":
@@ -179,158 +165,158 @@ if __name__ == "__main__":
     LOS_graph.set_dataframe(df = dataframe)
 
     # ------------------------------------------------- T2 ----------------------------------------------------------------------------
-    """
-    T2.1. Satellite Visibility Periods
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'PRN', color_bar_column_name = 'ELEV', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = False, title_plot = "Satellite Visibility", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'GPS-PRN', color_bar_label_name = 'Elevation [deg]'
-                           )
+    # """
+    # T2.1. Satellite Visibility Periods
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'PRN', color_bar_column_name = 'ELEV', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = False, title_plot = "Satellite Visibility", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'GPS-PRN', color_bar_label_name = 'Elevation [deg]'
+    #                        )
     
-    """
-    T2.2. Satellite Geometrical Range
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'RANGE[m]', color_bar_column_name = 'ELEV', y_div = 1000, \
-                           default_x_ticks = True, default_y_ticks = True, title_plot = "Satellite Geometical Range", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'RANGE[km]', color_bar_label_name = 'Elevation [deg]'
-                           )
+    # """
+    # T2.2. Satellite Geometrical Range
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'RANGE[m]', color_bar_column_name = 'ELEV', y_div = 1000, \
+    #                        default_x_ticks = True, default_y_ticks = True, title_plot = "Satellite Geometical Range", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'RANGE[km]', color_bar_label_name = 'Elevation [deg]'
+    #                        )
 
-    """
-    T2.3. Satellite Tracks
-    """
-    LOS_graph.plot_scatterplot_in_map(x_pos_column = 'SAT-X[m]', y_pos_column = 'SAT-Y[m]', z_pos_column = 'SAT-Z[m]', color_bar_column_name = 'ELEV', \
-                                  title_plot = 'Satellite Tracks during visibility periods', color_bar_label_name ='Elevation [deg]')
+    # """
+    # T2.3. Satellite Tracks
+    # """
+    # LOS_graph.plot_scatterplot_in_map(x_pos_column = 'SAT-X[m]', y_pos_column = 'SAT-Y[m]', z_pos_column = 'SAT-Z[m]', color_bar_column_name = 'ELEV', \
+    #                               title_plot = 'Satellite Tracks during visibility periods', color_bar_label_name ='Elevation [deg]')
     
-    """
-    T2.4. Satellite Velocity
-    """ 
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'ABS_VEL[m]', color_bar_column_name = 'ELEV', y_div = 1000, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite Range Velocity", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'Absolute Velocity [km/s]', color_bar_label_name = 'Elevation [deg]'
-                           )
+    # """
+    # T2.4. Satellite Velocity
+    # """ 
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'ABS_VEL[m]', color_bar_column_name = 'ELEV', y_div = 1000, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite Range Velocity", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'Absolute Velocity [km/s]', color_bar_label_name = 'Elevation [deg]'
+    #                        )
     
     """
     T2.5 NAV Satellite Clock
     """
-    # LOS_graph.plot_multiple_scatterplot(x_column_name = 'Hour', y_column_name = 'SV-CLK[m]', filter_by = 'PRN', default_x_ticks = True, default_y_ticks = True, title_plot = "NAV CLK", x_label_name = None, y_label_name = None)
+    LOS_graph.plot_multiple_sub_scatterplot(x_column_name = 'Hour', y_column_name = 'SV-CLK[m]', y_div = 1, filter_by = 'PRN', default_x_ticks = True, default_y_ticks = True, title_plot = "NAV CLK", x_label_name = None, y_label_name = None)
 
 
-    """
-    T2.6 Satellite Clock
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'SV-CLK[m]', color_bar_column_name = 'PRN', y_div = 1000, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite CLK", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'CLK[km]', color_bar_label_name = 'GPS-PRN'
-                           )
+    # """
+    # T2.6 Satellite Clock
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'SV-CLK[m]', color_bar_column_name = 'PRN', y_div = 1000, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite CLK", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'CLK[km]', color_bar_label_name = 'GPS-PRN'
+    #                        )
 
-    """
-    T2.7 Satellite TGD
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'CLK_P1[km]', color_bar_column_name = 'PRN', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite CLK + DTR - TGD", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'CLK[km]', color_bar_label_name = 'GPS-PRN'
-                           )
+    # """
+    # T2.7 Satellite TGD
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'CLK_P1[km]', color_bar_column_name = 'PRN', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite CLK + DTR - TGD", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'CLK[km]', color_bar_label_name = 'GPS-PRN'
+    #                        )
 
-    """
-    T2.8 Satellite DTR
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'TGD[m]', color_bar_column_name = 'PRN', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite TGD (Total Group Delay)", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'TGD[m]', color_bar_label_name = 'GPS-PRN'
-                           )
-    """
-    T3.1 STEC vs TIME (ELEV)
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'DTR[m]', color_bar_column_name = 'ELEV', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite DTR (Clock Relativistic Effect)", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'DTR[m]', color_bar_label_name = 'Elevation [deg]'
-                           )
-    """
-    T3.2 PRN vs TIME (STEC)
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'STEC[m]', color_bar_column_name = 'ELEV', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Ionispheric Klobuchar Delay (STEC)", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'STEC[m]', color_bar_label_name = 'Elevation [deg]'
-                           )
-    """
-    T3.3 VTEC vs. Time
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'PRN', color_bar_column_name = 'STEC[m]', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite Visibility vs STEC", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'GPS-PRN', color_bar_label_name = 'STEC[m]'
-                           )
-    """
-    T3.4 PRN vs. TIME
-    (VTEC)
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'VTEC[m]', color_bar_column_name = 'ELEV', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Ionosppheric Klobuchar Delays (VTEC)", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'VTEC[m]', color_bar_label_name = 'ELEV'
-                           )
-    """
-    T4.1 STD vs. Time
-    (Elevation)
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'PRN', color_bar_column_name = 'VTEC[m]', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite Visibility vs VTEC", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'GPS-PRN', color_bar_label_name = 'VTEC[m]'
-                           )
+    # """
+    # T2.8 Satellite DTR
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'TGD[m]', color_bar_column_name = 'PRN', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite TGD (Total Group Delay)", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'TGD[m]', color_bar_label_name = 'GPS-PRN'
+    #                        )
+    # """
+    # T3.1 STEC vs TIME (ELEV)
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'DTR[m]', color_bar_column_name = 'ELEV', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite DTR (Clock Relativistic Effect)", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'DTR[m]', color_bar_label_name = 'Elevation [deg]'
+    #                        )
+    # """
+    # T3.2 PRN vs TIME (STEC)
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'STEC[m]', color_bar_column_name = 'ELEV', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Ionispheric Klobuchar Delay (STEC)", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'STEC[m]', color_bar_label_name = 'Elevation [deg]'
+    #                        )
+    # """
+    # T3.3 VTEC vs. Time
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'PRN', color_bar_column_name = 'STEC[m]', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite Visibility vs STEC", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'GPS-PRN', color_bar_label_name = 'STEC[m]'
+    #                        )
+    # """
+    # T3.4 PRN vs. TIME
+    # (VTEC)
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'VTEC[m]', color_bar_column_name = 'ELEV', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Ionosppheric Klobuchar Delays (VTEC)", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'VTEC[m]', color_bar_label_name = 'ELEV'
+    #                        )
+    # """
+    # T4.1 STD vs. Time
+    # (Elevation)
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'PRN', color_bar_column_name = 'VTEC[m]', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Satellite Visibility vs VTEC", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'GPS-PRN', color_bar_label_name = 'VTEC[m]'
+    #                        )
 
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'TROPO[m]', color_bar_column_name = 'ELEV', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Slant Tropospheric Delay (STD)", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'TROPO[m]', color_bar_label_name = 'Elevation [deg]'
-                           )
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'TROPO[m]', color_bar_column_name = 'ELEV', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Slant Tropospheric Delay (STD)", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'TROPO[m]', color_bar_label_name = 'Elevation [deg]'
+    #                        )
     
-    """
-    T4.2 ZTD vs. Time
-    (Elevation)
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'ZTD', color_bar_column_name = 'ELEV', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Zenith Tropospheric Delays (ZTD)", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'ZTD', color_bar_label_name = 'Elevation [deg]'
-                           )
+    # """
+    # T4.2 ZTD vs. Time
+    # (Elevation)
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'ZTD', color_bar_column_name = 'ELEV', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Zenith Tropospheric Delays (ZTD)", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'ZTD', color_bar_label_name = 'Elevation [deg]'
+    #                        )
     
-    """
-    T5.1 PSR vs Time
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'MEAS[m]', color_bar_column_name = 'ELEV', y_div = 1000, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Pseudo-range C1C vs Time", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'MEAS[Km]', color_bar_label_name = 'Elevation [deg]'
-                           )
+    # """
+    # T5.1 PSR vs Time
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'MEAS[m]', color_bar_column_name = 'ELEV', y_div = 1000, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Pseudo-range C1C vs Time", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'MEAS[Km]', color_bar_label_name = 'Elevation [deg]'
+    #                        )
 
-    """
-    T5.2 TAU vs Time
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'Tau[ms]', color_bar_column_name = 'ELEV', y_div = 1000, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "TAU=Rho/c", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'Tau[ms]', color_bar_label_name = 'Elevation [deg]'
-                           )
+    # """
+    # T5.2 TAU vs Time
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'Tau[ms]', color_bar_column_name = 'ELEV', y_div = 1000, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "TAU=Rho/c", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'Tau[ms]', color_bar_label_name = 'Elevation [deg]'
+    #                        )
 
 
-    """
-    T5.3 ToF vs Time
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'TOF[ms]', color_bar_column_name = 'ELEV', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Time of Flight (ToF)", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'TOF[ms]', color_bar_label_name = 'Elevation [deg]'
-                           )
+    # """
+    # T5.3 ToF vs Time
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'TOF[ms]', color_bar_column_name = 'ELEV', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Time of Flight (ToF)", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'TOF[ms]', color_bar_label_name = 'Elevation [deg]'
+    #                        )
     
-    """
-    T5.4 Doppler
-    Frequency
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'F_Doppler', color_bar_column_name = 'ELEV', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Doppler Frequency", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'Doppler Frequency [kHz]', color_bar_label_name = 'Elevation [deg]'
-                           )
+    # """
+    # T5.4 Doppler
+    # Frequency
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'F_Doppler', color_bar_column_name = 'ELEV', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Doppler Frequency", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'Doppler Frequency [kHz]', color_bar_label_name = 'Elevation [deg]'
+    #                        )
 
 
-    """
-    T5.5 Residuals C1
-    """
-    LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'RES[km]', color_bar_column_name = 'PRN', y_div = 1, \
-                           default_x_ticks = False, default_y_ticks = True, title_plot = "Residuals C1C vs Time", \
-                           x_label_name = 'Hour of DoY', y_label_name = 'Residuals [km]', color_bar_label_name = 'GPS-PRN'
-                           )
+    # """
+    # T5.5 Residuals C1
+    # """
+    # LOS_graph.plot_scatterplot(x_column_name = 'Hour', y_column_name = 'RES[km]', color_bar_column_name = 'PRN', y_div = 1, \
+    #                        default_x_ticks = False, default_y_ticks = True, title_plot = "Residuals C1C vs Time", \
+    #                        x_label_name = 'Hour of DoY', y_label_name = 'Residuals [km]', color_bar_label_name = 'GPS-PRN'
+    #                        )
 
 
