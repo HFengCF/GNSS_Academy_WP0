@@ -1,4 +1,5 @@
 import sys, os
+import pandas as pd
 import numpy as np
 import math
 
@@ -11,7 +12,7 @@ import constants as cons
 from search_file import read_fields_file, fill_data_fields
 
 def main():
-    
+    pd.options.mode.chained_assignment = None
     # Scen_path = sys.argv[1]
     Scen_path = f'C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP'
     # folder_output = Scen_path + '/OUTPUT_SCEN_TLSA00615-GPSL1-SPP'

@@ -68,7 +68,7 @@ class LOS_Charts:
         dataframe['LAT'] = np.degrees(np.arcsin(dataframe['SAT-Z[m]'] / np.sqrt(dataframe['SAT-X[m]']**2 + dataframe['SAT-Y[m]']**2 + dataframe['SAT-Z[m]']**2)))
         plt.figure(figsize=(18, 12))
 
-        title = title_plot + " from TLSA on Year {:n} DoY {:3n}".format(dataframe['YEAR'].iloc[0], dataframe['DOY'].iloc[0])
+        title = title_plot + " from TLSA on Year {:n} DoY {}".format(dataframe['YEAR'].iloc[0], str(dataframe['DOY'].iloc[0]).zfill(3))
 
         # Source: https://semba-blog.netlify.app/07/04/2020/mapping-with-cartopy-in-python/
         ax = plt.axes(projection=ccrs.PlateCarree())
@@ -100,6 +100,7 @@ class LOS_Charts:
         list_unique_values = sorted(list(dataframe[filter_by].unique()))
 
         for i in list_unique_values:
+            print(title_plot+' '+filter_by+str(int(i))+'...')
             plt.figure(figsize=(18,12))
             df_aux = dataframe[dataframe[filter_by].str.contains(i)]
 
@@ -115,7 +116,7 @@ class LOS_Charts:
                 plt.yticks(ticks = sorted(dataframe[y_column_name].unique()))
 
             # Formats: https://www.w3schools.com/python/ref_string_format.asp
-            title = title_plot + " PRN {} from TLSA on Year {:n} DoY {:3n}".format(i, dataframe['YEAR'].iloc[0], dataframe['DOY'].iloc[0])
+            title = title_plot + " PRN {} from TLSA on Year {:n} DoY {}".format(i, dataframe['YEAR'].iloc[0], str(dataframe['DOY'].iloc[0]).zfill(3))
             plt.title(title)
             plt.xlabel(xlabel = x_label_name)
             plt.ylabel(ylabel = y_label_name)
@@ -123,6 +124,8 @@ class LOS_Charts:
             plt.grid(visible = True, axis = 'both', linestyle = '--', linewidth = 1, alpha = 0.4)
             plot = plt.scatter(x = df_aux[x_column_name].values, y = df_aux[y_column_name].values, marker = 's', s = 1)
             # plt.show()
+
+            # https://stackoverflow.com/questions/1841565/valueerror-invalid-literal-for-int-with-base-10
             plt.savefig(self.output_path+'/SubPlots/'+output_file_name+filter_by+str(i)+'.png')
 
 
