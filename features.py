@@ -64,5 +64,3 @@ POS_scatterplot = {
     "EPE_NPE": ['EPE[m]', 'NPE[m]', 'HDOP', 1, False, True, "EPE vs NPE", 'EPE[m]', 'NPE[m]', 'HDOP', 'POS_NPE_vs_EPE_TLSA_D006Y15']
     
 }
-
-print(LOS_scatterplot_data)
