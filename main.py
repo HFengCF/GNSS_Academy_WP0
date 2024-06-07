@@ -1,3 +1,6 @@
+#!/usr/bin/env python39
+# 
+# Author: Hao Feng Chen Fu
 import sys, os
 import pandas as pd
 import numpy as np
@@ -13,20 +16,16 @@ from search_file import read_fields_file, fill_data_fields
 
 def main():
     pd.options.mode.chained_assignment = None
-    # Scen_path = sys.argv[1]
-    Scen_path = f'C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP'
-    # folder_output = Scen_path + '/OUTPUT_SCEN_TLSA00615-GPSL1-SPP'
-
-    # print('Path: ', folder_output)
-    # if not os.path.exists(folder_output):
-    #     os.makedirs(folder_output)
-
-    # if not os.path.exists(folder_output+'/SubPlots'):
-    #     os.makedirs(folder_output+'/SubPlots')
+    if len(sys.argv) < 2:
+        print('ERROR: Insert a path in the second argument')
+        sys.exit()
+    else:
+        Scen_path = sys.argv[1]
+    # Scen_path = f'C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP'
 
     generate_LOS_figures(Scen_path)
 
-    # generate_POS_figures(Scen_path+cons.POS_path)
+    generate_POS_figures(Scen_path)
 
 
 
@@ -77,14 +76,14 @@ def generate_LOS_figures(path_out = None):
     LOS_graph.set_dataframe(df = dataframe)
     """ ------------------------------------------------------------------------------------------------ """
 
-    # for key, value in features.LOS_scatterplot_data.items():
-    #     # If a put pos_args = value y got this error:     LOS_graph.plot_multiple_sub_scatterplot(*pos_args) TypeError: plot_multiple_sub_scatterplot() takes from 4 to 11 positional arguments but 12 were given
-    #     pos_args = value
-    #     LOS_graph.plot_scatterplot(*pos_args)
+    for key, value in features.LOS_scatterplot_data.items():
+        # If a put pos_args = value y got this error:     LOS_graph.plot_multiple_sub_scatterplot(*pos_args) TypeError: plot_multiple_sub_scatterplot() takes from 4 to 11 positional arguments but 12 were given
+        pos_args = value
+        LOS_graph.plot_scatterplot(*pos_args)
     
-    # for key, value in features.LOS_scatterplot_map_data.items():
-    #     pos_args = value
-    #     LOS_graph.plot_scatterplot_in_map(*pos_args)
+    for key, value in features.LOS_scatterplot_map_data.items():
+        pos_args = value
+        LOS_graph.plot_scatterplot_in_map(*pos_args)
 
     for key, value in features.LOS_CLK_scatter_plots.items():
         pos_args = value
@@ -92,12 +91,20 @@ def generate_LOS_figures(path_out = None):
 
 
 
-def generate_POS_figures(path_name = None):
+def generate_POS_figures(path_out = None):
     # if path_name == None:
     #     print('No path has been provided for LOS data')
     #     exit()
+
+    path_name = path_out + cons.POS_path
+    folder_output = path_out + '/OUTPUT/POS/'
+
+    if not os.path.exists(folder_output):
+        print('Create Folder: ', folder_output)
+        os.makedirs(folder_output)
+
     dict = read_fields_file(path_name)
-    POS_graph = POS_Charts(fill_data_fields(dict, path_name))
+    POS_graph = POS_Charts(fill_data_fields(dict, path_name), output_path = folder_output)
 
     print('----------------------------------------')
     print('LOS Charts generation...')

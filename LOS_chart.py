@@ -58,6 +58,7 @@ class LOS_Charts:
 
         # plt.show()
         plt.savefig(self.output_path+output_file_name+'.png')
+        plt.close()
 
     def plot_scatterplot_in_map(self, x_pos_column, y_pos_column, z_pos_column, color_bar_column_name, title_plot = "Default title", color_bar_label_name = None, output_file_name = "Output"):
         dataframe = self.dataframe[['DOY', 'YEAR', x_pos_column, y_pos_column, z_pos_column, color_bar_column_name]]
@@ -86,6 +87,7 @@ class LOS_Charts:
 
         # plt.show()
         plt.savefig(self.output_path+output_file_name+'.png')
+        plt.close()
 
     def plot_multiple_sub_scatterplot(self, x_column_name, y_column_name, filter_by, y_div = 1, default_x_ticks =  False, default_y_ticks = False, title_plot = "Default_Title", x_label_name = None, y_label_name = None, output_file_name = "Output"):
         dataframe = self.dataframe[[x_column_name, y_column_name, filter_by, 'DOY', 'YEAR']]
@@ -100,7 +102,7 @@ class LOS_Charts:
         list_unique_values = sorted(list(dataframe[filter_by].unique()))
 
         for i in list_unique_values:
-            print(title_plot+' '+filter_by+str(int(i))+'...')
+            print(title_plot+' '+filter_by+str(int(float(i)))+'...')
             plt.figure(figsize=(18,12))
             df_aux = dataframe[dataframe[filter_by].str.contains(i)]
 
@@ -116,7 +118,7 @@ class LOS_Charts:
                 plt.yticks(ticks = sorted(dataframe[y_column_name].unique()))
 
             # Formats: https://www.w3schools.com/python/ref_string_format.asp
-            title = title_plot + " PRN {} from TLSA on Year {:n} DoY {}".format(i, dataframe['YEAR'].iloc[0], str(dataframe['DOY'].iloc[0]).zfill(3))
+            title = title_plot + " PRN {} from TLSA on Year {:n} DoY {}".format(int(float(i)), dataframe['YEAR'].iloc[0], str(dataframe['DOY'].iloc[0]).zfill(3))
             plt.title(title)
             plt.xlabel(xlabel = x_label_name)
             plt.ylabel(ylabel = y_label_name)
@@ -126,7 +128,8 @@ class LOS_Charts:
             # plt.show()
 
             # https://stackoverflow.com/questions/1841565/valueerror-invalid-literal-for-int-with-base-10
-            plt.savefig(self.output_path+'/SubPlots/'+output_file_name+filter_by+str(i)+'.png')
+            plt.savefig(self.output_path+'/SubPlots/'+output_file_name+filter_by+str(int(float(i)))+'.png')
+            plt.close()
 
 
 if __name__ == "__main__":

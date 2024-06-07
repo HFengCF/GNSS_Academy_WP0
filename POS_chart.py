@@ -10,12 +10,17 @@ import math
 from search_file import read_fields_file, fill_data_fields
 
 class POS_Charts:
-    def __init__(self, df) -> None:
+    def __init__(self, df, output_path = None) -> None:
         self.dataframe = df
         self.dataframe['Hour'] = self.dataframe['SOD']/(3600)
 
         self.min_hour = min(self.dataframe['Hour'])
         self.max_hour = max(self.dataframe['Hour'])
+
+        if output_path is not None:
+            self.output_path = output_path
+        else:
+            self.output_path = ""  
 
     def get_dataframe(self):
         return self.dataframe
@@ -24,6 +29,9 @@ class POS_Charts:
         self.dataframe = df
 
     def plot_linearplot(self, x_column_name, x_column_label, y_column_label, title_plot = "Default_Title", output_file_name = 'Output' , **kwargs):
+
+        print(title_plot+'...')
+
         plt.rcParams["image.cmap"] = "gnuplot"
         # Change color set used: https://matplotlib.org/stable/gallery/color/colormap_reference.html
         plt.rcParams['axes.prop_cycle'] = plt.cycler(color=plt.cm.Paired.colors)
@@ -32,7 +40,7 @@ class POS_Charts:
         for key, value in kwargs.items():
             plt.plot(self.dataframe[x_column_name], self.dataframe[value], label = value)
 
-        title = title_plot + " from TLSA on Year {:n} DoY {:3n}".format(self.dataframe['YEAR'].iloc[0], self.dataframe['DOY'].iloc[0])
+        title = title_plot + " from TLSA on Year {:n} DoY {}".format(self.dataframe['YEAR'].iloc[0], str(int(self.dataframe['DOY'].iloc[0])).zfill(3))
 
         plt.xlabel(x_column_label) 
         plt.ylabel(y_column_label) 
@@ -44,7 +52,8 @@ class POS_Charts:
         plt.legend()
 
         # plt.show()
-        plt.savefig(output_file_name+'.png')
+        plt.savefig(self.output_path+output_file_name+'.png')
+        plt.close()
         
 
 
@@ -52,6 +61,8 @@ class POS_Charts:
     def plot_scatterplot_POS(self, x_column_name, y_column_name, color_bar_column_name, y_div = 1,default_x_ticks =  False, default_y_ticks = False, title_plot = "Default_Title", x_label_name = None, y_label_name = None, color_bar_label_name = None,  output_file_name = 'Output'):
         dataframe = self.dataframe[[x_column_name, y_column_name, color_bar_column_name, 'DOY', 'YEAR']]
         dataframe[y_column_name] = dataframe[y_column_name]/y_div
+
+        print(title_plot+'...')
 
         plt.figure(figsize=(10,6))
 
@@ -65,7 +76,7 @@ class POS_Charts:
             plt.yticks(ticks = range(-3, 5))
 
         # Formats: https://www.w3schools.com/python/ref_string_format.asp
-        title = title_plot + " from TLSA on Year {:n} DoY {:3n}".format(dataframe['YEAR'].iloc[0], dataframe['DOY'].iloc[0])
+        title = title_plot + " from TLSA on Year {:n} DoY {}".format(self.dataframe['YEAR'].iloc[0], str(int(self.dataframe['DOY'].iloc[0])).zfill(3))
 
         plt.title(title)
         plt.xlabel(xlabel = x_label_name)
@@ -77,7 +88,8 @@ class POS_Charts:
         cbar.set_label(color_bar_label_name)
 
         # plt.show()
-        plt.savefig(output_file_name+'.png')
+        plt.savefig(self.output_path+output_file_name+'.png')
+        plt.close()
 
 if __name__ == "__main__":
     path_name = f"C:/Users/fengc/OneDrive/Documentos/WP0_RCVR_ANALYSIS/SCEN/SCEN_TLSA00615-GPSL1-SPP/OUT/POS/TLSA00615_PosInfo_5s.dat"
