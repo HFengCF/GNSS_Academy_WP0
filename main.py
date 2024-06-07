@@ -9,7 +9,7 @@ import math
 from POS_chart import POS_Charts
 from LOS_chart import LOS_Charts
 
-import features
+import input_constants
 import constants as cons
 
 from search_file import read_fields_file, fill_data_fields
@@ -76,16 +76,16 @@ def generate_LOS_figures(path_out = None):
     LOS_graph.set_dataframe(df = dataframe)
     """ ------------------------------------------------------------------------------------------------ """
 
-    for key, value in features.LOS_scatterplot_data.items():
+    for key, value in input_constants.LOS_scatterplot_data.items():
         # If a put pos_args = value y got this error:     LOS_graph.plot_multiple_sub_scatterplot(*pos_args) TypeError: plot_multiple_sub_scatterplot() takes from 4 to 11 positional arguments but 12 were given
         pos_args = value
         LOS_graph.plot_scatterplot(*pos_args)
     
-    for key, value in features.LOS_scatterplot_map_data.items():
+    for key, value in input_constants.LOS_scatterplot_map_data.items():
         pos_args = value
         LOS_graph.plot_scatterplot_in_map(*pos_args)
 
-    for key, value in features.LOS_CLK_scatter_plots.items():
+    for key, value in input_constants.LOS_CLK_scatter_plots.items():
         pos_args = value
         LOS_graph.plot_multiple_sub_scatterplot(*pos_args)
 
@@ -117,7 +117,7 @@ def generate_POS_figures(path_out = None):
     POS_graph.set_dataframe(df = dataframe)
     """ ------------------------------------------------------------------------------------------------ """
 
-    for key, value in features.POS_plots.items():
+    for key, value in input_constants.POS_plots.items():
         pos_args = value[:5]
         kw_args = {}
 
@@ -128,7 +128,7 @@ def generate_POS_figures(path_out = None):
 
         POS_graph.plot_linearplot(*pos_args, **kw_args)
 
-    for key, value in features.POS_scatterplot.items():
+    for key, value in input_constants.POS_scatterplot.items():
         POS_graph.plot_scatterplot_POS(*value)
 
 
