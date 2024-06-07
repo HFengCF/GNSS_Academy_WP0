@@ -53,11 +53,11 @@ LOS_CLK_scatter_plots = {
 }
 
 POS_plots = {
-    "Sat_number": ['Hour', 'Hour of DoY', 'Number of Satellites', "Number of Satellites in PVT vs Time", 'NSATS'],
-    "DOPs": ['Hour', 'Hour of DoY', 'DOP', "Dilution of Precision (DOP)", 'GDOP', 'PDOP', 'TDOP'],
-    "H_V DOPs": ['Hour', 'Hour of DoY', 'DOP', "Dilution of Precision (DOP)", 'HDOP', 'VDOP', 'NSATS'],
-    "ENU": ['Hour', 'Hour of DoY', 'ENU_PM[m]', "ENU Position Error", 'UPE[m]', 'EPE[m]', 'NPE[m]'],
-    "HPE_VPE": ['Hour', 'Hour of DoY', 'H/VPE[m]', "HPE-VPE Position Error", 'VPE', 'HPE']
+    "Sat_number": ['Hour', 'Hour of DoY', 'Number of Satellites', "Number of Satellites in PVT vs Time", 'POS_SATS_vs_TIME_TLSA_D006Y15', 'NSATS'],
+    "DOPs": ['Hour', 'Hour of DoY', 'DOP', "Dilution of Precision (DOP)", 'POS_DOP_vs_TIME_TLSA_D006Y15', 'GDOP', 'PDOP', 'TDOP'],
+    "H_V DOPs": ['Hour', 'Hour of DoY', 'DOP', "Dilution of Precision (DOP)", 'POS_HVDOP_vs_TIME_TLSA_D006Y15','HDOP', 'VDOP', 'NSATS'],
+    "ENU": ['Hour', 'Hour of DoY', 'ENU_PM[m]', "ENU Position Error", 'POS_ENU_PE_vs_TIME_TLSA_D006Y15','UPE[m]', 'EPE[m]', 'NPE[m]'],
+    "HPE_VPE": ['Hour', 'Hour of DoY', 'H/VPE[m]', "HPE-VPE Position Error", 'POS_HVPE_vs_TIME_TLSA_D006Y15','VPE', 'HPE']
 
 }
 POS_scatterplot = {
