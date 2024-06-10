@@ -63,7 +63,7 @@ LOS_scatterplot_data = {
 }
 
 LOS_scatterplot_map_data = {
-    "Sat_Tracks": ['SAT-X[m]', 'SAT-Y[m]', 'SAT-Z[m]', 'ELEV', 'Satellite Tracks during visibility periods', 'Elevation [deg]', 'Satellite tracks during visibility periods']
+    "Sat_Tracks": ['SAT-X[m]', 'SAT-Y[m]', 'SAT-Z[m]', 'ELEV', 'Satellite Tracks during visibility periods', 'Elevation [deg]', 'SAT_TRACKS_TLSA_D006Y15']
 }
 
 LOS_CLK_scatter_plots = {

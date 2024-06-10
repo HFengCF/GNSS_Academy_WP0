@@ -65,9 +65,21 @@ def generate_LOS_figures(path_out = None):
     # T5.2 
     dataframe['Tau[ms]'] = dataframe['TROPO[m]']/cons.light_speed
 
-    # T5.4
-    dataframe['R_LOS[m]'] = (dataframe['SAT-X[m]']**2 + dataframe['SAT-Y[m]']**2 + dataframe['SAT-Z[m]']**2)**0.5 - (cons.x_pos_receiver**2 + cons.y_pos_receiver**2 + cons.z_pos_receiver**2)**0.5
-    dataframe['V_LOS[m]'] = dataframe['ABS_VEL[m]'] * ( dataframe['R_LOS[m]'] / abs(dataframe['R_LOS[m]']) )
+
+    # T5.4  - RLOS ARE VECTORS
+    # Vector of R_satellite - Vector of Receiver position (Always the same)
+    # Getting the unit vector dividing the result of previous calculus by its module
+    # Later on, producto escalar con la velocidad del satelite
+    # Finally, getting Doppler Frequency
+    dataframe['R_LOS_X'] = dataframe['SAT-X[m]'] - cons.x_pos_receiver
+    dataframe['R_LOS_Y'] = dataframe['SAT-Y[m]'] - cons.y_pos_receiver
+    dataframe['R_LOS_Z'] = dataframe['SAT-Z[m]'] - cons.z_pos_receiver
+
+    dataframe['U_LOS_X'] = dataframe['R_LOS_X'] / (dataframe['R_LOS_X']**2 + dataframe['R_LOS_Y']**2 + dataframe['R_LOS_Z']**2)**0.5
+    dataframe['U_LOS_Y'] = dataframe['R_LOS_Y'] / (dataframe['R_LOS_X']**2 + dataframe['R_LOS_Y']**2 + dataframe['R_LOS_Z']**2)**0.5
+    dataframe['U_LOS_Z'] = dataframe['R_LOS_Z'] / (dataframe['R_LOS_X']**2 + dataframe['R_LOS_Y']**2 + dataframe['R_LOS_Z']**2)**0.5
+
+    dataframe['V_LOS[m]'] = dataframe['VEL-X[m/s]']*dataframe['U_LOS_X'] + dataframe['VEL-Y[m/s]']*dataframe['U_LOS_Y'] + dataframe['VEL-Z[m/s]']*dataframe['U_LOS_Z']
     dataframe['F_Doppler'] = - ( dataframe['V_LOS[m]']/cons.light_speed ) * cons.frecuency_L1
 
     # T5.5
